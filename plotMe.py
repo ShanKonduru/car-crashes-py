@@ -16,35 +16,27 @@ df.columns = df.columns.str.strip()
 # You can find the shapefile at: https://www.naturalearthdata.com/downloads/110m-cultural-vectors/110m-admin-1-states-provinces/
 us_states = gpd.read_file('ne_110m_admin_1_states_provinces.shp')
 
-# Print information about the CSV DataFrame
-print("CSV DataFrame Information:")
-print(df.info())
+# Print unique values in 'state_abbr' column to check consistency
+print("Unique values in 'state_abbr' column in the CSV file:")
+print(df['state_abbr'].unique())
 
-# Print the first few rows of the CSV DataFrame
-print("First few rows of the CSV DataFrame:")
-print(df.head())
-
-# Print information about the US states GeoDataFrame
-print("US States GeoDataFrame Information:")
-print(us_states.info())
-
-# Print the first few rows of the US states GeoDataFrame
-print("First few rows of the US States GeoDataFrame:")
-print(us_states.head())
+# Print unique values in 'iso_a2' column from the shapefile to check consistency
+print("Unique values in 'iso_a2' column from the US States shapefile:")
+print(us_states['iso_a2'].unique())
 
 # Merge the US states GeoDataFrame with your data based on the 'state_abbr' column
 merged_data = us_states.merge(df, how='left', left_on='state_abbr', right_on='state_abbr')
 
-# Print information about the merged dataset
+# Print the merged dataset information
 print("Merged Dataset Information:")
 print(merged_data.info())
-
-# Convert 'Days_stayed' column to numeric if it's not already
-merged_data['Days_stayed'] = pd.to_numeric(merged_data['Days_stayed'], errors='coerce')
 
 # Print the first few rows of the merged dataset
 print("First few rows of the Merged Dataset:")
 print(merged_data.head())
+
+# Convert 'Days_stayed' column to numeric if it's not already
+merged_data['Days_stayed'] = pd.to_numeric(merged_data['Days_stayed'], errors='coerce')
 
 # Create a Folium map centered around the USA
 m = folium.Map(location=[37, -95], zoom_start=4)
