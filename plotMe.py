@@ -12,20 +12,19 @@ df = pd.read_csv(csv_file)
 # Remove leading and trailing spaces from column names
 df.columns = df.columns.str.strip()
 
+# Update 'state_abbr' values by removing the 'US-' prefix
+df['state_abbr'] = df['state_abbr'].str.replace('US-', '')
+
 # Download the US states shapefile from Natural Earth Data
 # You can find the shapefile at: https://www.naturalearthdata.com/downloads/110m-cultural-vectors/110m-admin-1-states-provinces/
 us_states = gpd.read_file('ne_110m_admin_1_states_provinces.shp')
 
-# Print unique values in 'state_abbr' column to check consistency
-print("Unique values in 'state_abbr' column in the CSV file:")
-print(df['state_abbr'].unique())
+# Print unique values in 'iso_3166_2' column from the US States shapefile
+print("Unique values in 'iso_3166_2' column from the US States shapefile:")
+print(us_states['iso_3166_2'].unique())
 
-# Print unique values in 'iso_a2' column from the shapefile to check consistency
-print("Unique values in 'iso_a2' column from the US States shapefile:")
-print(us_states['iso_a2'].unique())
-
-# Merge the US states GeoDataFrame with your data based on the 'state_abbr' column
-merged_data = us_states.merge(df, how='left', left_on='state_abbr', right_on='state_abbr')
+# Merge the US states GeoDataFrame with your data based on the 'iso_3166_2' column
+merged_data = us_states.merge(df, how='left', left_on='iso_3166_2', right_on='state_abbr')
 
 # Print the merged dataset information
 print("Merged Dataset Information:")
@@ -35,8 +34,8 @@ print(merged_data.info())
 print("First few rows of the Merged Dataset:")
 print(merged_data.head())
 
-# Convert 'Days_stayed' column to numeric if it's not already
-merged_data['Days_stayed'] = pd.to_numeric(merged_data['Days_stayed'], errors='coerce')
+# Explicitly modify 'Days_stayed' column in the original DataFrame to handle the SettingWithCopyWarning
+merged_data.loc[:, 'Days_stayed'] = pd.to_numeric(merged_data['Days_stayed'], errors='coerce')
 
 # Create a Folium map centered around the USA
 m = folium.Map(location=[37, -95], zoom_start=4)
