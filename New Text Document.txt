@@ -1,0 +1,1 @@
+visited_date, state, Days_stayed
